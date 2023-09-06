@@ -33,7 +33,6 @@ dependencies = [
 name = "muchine_learning_tutotial"
 version = "0.1.0"
 dependencies = [
- "read_csv",
  "rusty-machine",
  "serde",
  "serde_derive",
@@ -149,14 +148,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "678054eb77286b51581ba43620cc911abf02758c91f93f479767aed0f90458b2"
 dependencies = [
  "rand_core 0.3.1",
-]
-
-[[package]]
-name = "read_csv"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_derive",
 ]
 
 [[package]]
