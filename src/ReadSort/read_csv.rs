@@ -107,7 +107,7 @@ pub fn main(){
     let x_test_matrix = Matrix::new(test_size, 13, x_test);
 
      // MODEL! 
-     let mut linearRegression = LinRegressor::default(); 
+     let mut linearRegression: LinRegressor = LinRegressor::default(); 
      // train 
      linearRegression.train(&x_train_matrix, &y_train_vector);
      // predictions
