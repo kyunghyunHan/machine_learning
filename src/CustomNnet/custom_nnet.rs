@@ -4,13 +4,15 @@
 use std::result::Result;
 use std::error::Error;
 use mnist::*;
-use tch::{kind, no_grad, Kind, Tensor};
+use tch::{kind, Kind, Tensor, nn, nn::Module, nn::OptimizerConfig, Device};
 use ndarray::{Array3, Array2};
 
 
 const LABELS: i64 = 10; // number of distinct labels
 const HEIGHT: usize = 28; 
 const WIDTH: usize = 28;
+const IMAGE_DIM: i64 = 784;
+const HIDDEN_NODES: i64 = 128;
 
 const TRAIN_SIZE: usize = 50000;
 const VAL_SIZE: usize = 10000;
@@ -19,6 +21,15 @@ const TEST_SIZE: usize =10000;
 const N_EPOCHS: i64 = 200;
 
 const THRES: f64 = 0.001;
+
+const BATCH_SIZE: i64 = 256;
+
+fn net(vs: &nn::Path) -> impl Module{
+    nn::seq()
+    .add(nn::linear(vs/"layer1", IMAGE_DIM, HIDDEN_NODES, Default::default() ))
+    .add_fn(|xs| xs.relu())
+    .add(nn::linear(vs, HIDDEN_NODES, LABELS, Default::default()))
+}
 
 
 pub fn image_to_tensor(data:Vec<u8>, dim1:usize, dim2:usize, dim3:usize)-> Tensor{
@@ -51,6 +62,12 @@ pub fn labels_to_tensor(data:Vec<u8>, dim1:usize, dim2:usize)-> Tensor{
 }
 
 
+pub fn generate_random_index(ArraySize: i64, BatchSize: i64)-> Tensor{
+    let random_idxs = Tensor::randint(ArraySize, &[BatchSize], kind::INT64_CPU);
+    random_idxs
+}
+
+
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>())
 }
@@ -74,8 +91,6 @@ pub fn main()-> Result<(), Box<dyn Error>> {
         .finalize();
     
     // set up a weight and bias tensor
-    let mut ws = Tensor::zeros(&[(HEIGHT*WIDTH) as i64, LABELS], kind::FLOAT_CPU).set_requires_grad(true);
-    let mut bs = Tensor::zeros(&[LABELS], kind::FLOAT_CPU).set_requires_grad(true);
     let train_data = image_to_tensor(trn_img, TRAIN_SIZE, HEIGHT, WIDTH);
     let train_lbl = labels_to_tensor(trn_lbl, TRAIN_SIZE, 1);
     let test_data = image_to_tensor(tst_img, TEST_SIZE, HEIGHT, WIDTH); 
@@ -83,64 +98,31 @@ pub fn main()-> Result<(), Box<dyn Error>> {
     let val_data = image_to_tensor(val_img, VAL_SIZE, HEIGHT, WIDTH);
     let val_lbl = labels_to_tensor(val_lbl, VAL_SIZE, 1);
 
-
+    // set up variable store to check if cuda is available 
+    let vs = nn::VarStore::new(Device::cuda_if_available());
+    // set up the seq net 
+    let net = net(&vs.root());
+    // set up optimizer 
+    let mut opt = nn::Adam::default().build(&vs, 1e-4)?;
+    println!("Number of iteration with given batch size: {:?}", net);
     // run epochs 
-    let mut loss_diff;
-    let mut curr_loss = 0.0;
-
-    'train: for epoch in 1..N_EPOCHS{
-        // neural network multiplication
-        let logits = train_data.matmul(&ws) + &bs; 
-        // compute the loss as log softmax
-        let loss = logits.log_softmax(-1, Kind::Float).nll_loss(&train_lbl);
-        // gradient
-        ws.zero_grad();
-        bs.zero_grad();
-        loss.backward();
-        // back propgation
-        no_grad(|| {
-            ws += ws.grad()*(-1);
-            bs += bs.grad()*(-1);
-        });
-        // validation
-        let val_logits = val_data.matmul(&ws) + &bs;
-        let val_accuracy = val_logits
-            .argmax(Some(-1), false)
-            .eq_tensor(&val_lbl)
-            .to_kind(Kind::Float)
-            .mean(Kind::Float)
-            .double_value(&[]);
-
+    for epoch in 1..N_EPOCHS {
+        let loss = net.forward(&train_data).cross_entropy_for_logits(&train_lbl);
+        // backward step 
+        opt.backward_step(&loss);
+        //accuracy on test
+        let val_accuracy = net.forward(&val_data).accuracy_for_logits(&val_lbl);
         println!(
             "epoch: {:4} train loss: {:8.5} val acc: {:5.2}%",
             epoch,
-            loss.double_value(&[]),
-            100. * val_accuracy
+            f64::from(&loss),
+            100. * f64::from(&val_accuracy),
         );
-        // early stop 
-        if epoch == 1{
-            curr_loss = loss.double_value(&[]);
-        } else {
-            loss_diff = (loss.double_value(&[]) - curr_loss).abs(); 
-            curr_loss = loss.double_value(&[]); 
-            // if we are less then threshold stop 
-            if loss_diff < THRES {
-                println!("Target accuracy reached, early stopping");
-                break 'train;
-            }
-        }
+    }
 
-    } 
-
-    // the final weight and bias gives us the test accuracy
-    let test_logits = test_data.matmul(&ws) + &bs; 
-    let test_accuracy = test_logits
-        .argmax(Some(-1), false)
-        .eq_tensor(&test_lbl)
-        .to_kind(Kind::Float)
-        .mean(Kind::Float)
-        .double_value(&[]);
-    println!("Final test accuracy {:5.2}%", 100.*test_accuracy);
+    // final test 
+    let test_accuracy = net.forward(&test_data).accuracy_for_logits(&test_lbl);
+    println!("Final test accuracy {:5.2}%", 100.*f64::from(&test_accuracy));
 
     Ok(())
 }
