@@ -11,7 +11,7 @@ serde_derive = "1.0.126"
 rusty-machine = "0.5.4"
 polars = "0.14.2"
 polars-core = {version = "0.14.2", features=["ndarray"]}
-smartcore = "0.2.0"
+smartcore = "0.3.2"
 tch = "0.8.0"
 mnist = {version = "0.5.0", features = ["download"]}
 ndarray = "0.15.6"
