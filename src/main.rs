@@ -1,9 +1,12 @@
-extern crate serde;
 
+mod KMeans;
 mod KNearestNeighbors;
-fn main() {
-
-    KNearestNeighbors::k_nearest_neighbors::main();
+mod data_fusion;
+ fn main() {
+    //k-최근접이웃
+    // KNearestNeighbors::k_nearest_neighbors::main(); 
+    // KMeans::k_means::main();//k-
+    data_fusion::data_fusion::main();
     // println!("Hello, world!!!!");
     // ConvNnet::conv_nnet::main();
     // CustomNnet::custom_nnet::main();
