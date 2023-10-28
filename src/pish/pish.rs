@@ -12,19 +12,13 @@ pub fn main() {
         700.0, 725.0, 720.0, 714.0, 850.0, 1000.0, 920.0, 955.0, 925.0, 975.0, 950.0,
     ];
 
-    let smelt_length = vec![
-        9.8, 10.5, 10.6, 11.0, 11.2, 11.3, 11.8, 11.8, 12.0, 12.2, 12.4, 13.0, 14.3, 15.0,
-    ];
-    let smelt_weight = vec![
-        6.7, 7.5, 7.0, 9.7, 9.8, 8.7, 10.0, 9.9, 9.8, 12.2, 13.4, 12.2, 19.7, 19.9,
-    ];
-
     // Create a scatter plot
-    let root = BitMapBackend::new("scatter_plot.png", (800, 600)).into_drawing_area();
+    let root = BitMapBackend::new("scatter_plot.png", (800, 600))
+        .into_drawing_area();
     root.fill(&WHITE).unwrap();
 
-    let x_range = 0.0..45.0; // Adjust the x-axis range based on your data
-    let y_range = 0.0..1050.0; // Adjust the y-axis range based on your data
+    let x_range = 25.0..45.0;
+    let y_range = 0.0..1050.0;
 
     let mut chart = ChartBuilder::on(&root)
         .x_label_area_size(40)
@@ -46,17 +40,6 @@ pub fn main() {
                 .zip(bream_weight.iter())
                 .map(|(x, y)| {
                     Circle::new((*x, *y), 5, Into::<ShapeStyle>::into(&RGBColor(255, 0, 0)))
-                }),
-        )
-        .unwrap();
-
-    chart
-        .draw_series(
-            smelt_length
-                .iter()
-                .zip(smelt_weight.iter())
-                .map(|(x, y)| {
-                    Circle::new((*x, *y), 5, Into::<ShapeStyle>::into(&RGBColor(0, 0, 255)))
                 }),
         )
         .unwrap();
