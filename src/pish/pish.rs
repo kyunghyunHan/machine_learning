@@ -1,4 +1,5 @@
 use plotters::prelude::*;
+use smartcore::linalg::basic::matrix::DenseMatrix;
 
 pub fn main() {
     let bream_length = vec![
@@ -43,4 +44,12 @@ pub fn main() {
                 }),
         )
         .unwrap();
+
+
+
+        let data = vec![1, 2, 3, 4, 5, 6, 7, 8, 9]; // data points
+        let knn = LinearKNNSearch::new(data, SimpleDistance {}).unwrap();
+        knn.find(&5, 3); // find 3 knn points from 5
+       println!("{}",knn.find(&5, 3); );
+
 }
