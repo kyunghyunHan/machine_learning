@@ -19,6 +19,7 @@ use smartcore::neighbors::knn_classifier::KNNClassifier;
 use smartcore::model_selection::train_test_split;
 use smartcore::metrics::roc_auc_score;
 use smartcore::metrics::completeness_score;
+use smartcore::metrics::accuracy;
 
 fn main() {
     // 도미 데이터
@@ -131,9 +132,9 @@ fn main() {
         let fish_data_2d: Vec<Vec<f64>> = fish_data.iter().map(|arr| arr.to_vec()).collect();
         let fish_target_vec: Vec<f64> = fish_target.iter().map(|&x| x as f64).collect();
     
-        let x: DenseMatrix<f64> = DenseMatrix::from_2d_array(
-            &fish_data_2d.iter().map(|row| row.as_slice()).collect::<Vec<_>>()
-        );
+        // let x: DenseMatrix<f64> = DenseMatrix::from_2d_array(
+        //     &fish_data_2d.iter().map(|row| row.as_slice()).collect::<Vec<_>>()
+        // );
         let y: Vec<f64> = fish_target_vec;
         // let bream_length: Array1<f64> = Array::from(vec![
         //     25.4, 26.3, 26.5, 29.0, 29.0, 29.7, 29.7, 30.0, 30.0, 30.7, 31.0, 31.0,
@@ -194,70 +195,59 @@ let num_features = data[0].len();
 // let auc = roc_auc_score(&y_test, &y_hat_knn);
 // println!("AUC: {}", auc);
 
-let x: DenseMatrix<f32> = DenseMatrix::from_2d_array(&[
-    &[25.4, 242.0],
+let fish_data: DenseMatrix<f32> = DenseMatrix::from_2d_array(&[
+     &[25.4, 242.0],
      &[26.3, 290.0],
-      &[26.5, 340.0],&[29.0, 363.0], &[29.0, 430.0],& [29.7, 450.0],& [29.7, 500.0], &[30.0, 390.0],& [30.0, 450.0], &[30.7, 500.0], &[31.0, 475.0], &[31.0, 500.0], &[31.5, 500.0], &[32.0, 340.0], &[32.0, 600.0], &[32.0, 600.0],& [33.0, 700.0],& [33.0, 700.0], &[33.5, 610.0],& [33.5, 650.0], &[34.0, 575.0], &[34.0, 685.0], &[34.5, 620.0], &[35.0, 680.0], &[35.0, 700.0], &[35.0, 725.0],& [35.0, 720.0],& [36.0, 714.0],&[36.0, 850.0], &[37.0, 1000.0], &[38.5, 920.0],& [38.5, 955.0], &[39.5, 925.0],& [41.0, 975.0], &[41.0, 950.0], &[9.8, 6.7],&[10.5, 7.5], &[10.6, 7.0],& [11.0, 9.7],&[11.2, 9.8],& [11.3, 8.7], &[11.8, 10.0],& [11.8, 9.9],& [12.0, 9.8],& [12.2, 12.2],& [12.4, 13.4], &[13.0, 12.2], &[14.3, 19.7],&[15.0, 19.9]]
+     &[26.5, 340.0],&[29.0, 363.0], &[29.0, 430.0],& [29.7, 450.0],& [29.7, 500.0], &[30.0, 390.0],& [30.0, 450.0], &[30.7, 500.0], &[31.0, 475.0], &[31.0, 500.0], &[31.5, 500.0], &[32.0, 340.0], &[32.0, 600.0], &[32.0, 600.0],& [33.0, 700.0],& [33.0, 700.0], &[33.5, 610.0],& [33.5, 650.0], &[34.0, 575.0], &[34.0, 685.0], &[34.5, 620.0], &[35.0, 680.0], &[35.0, 700.0], &[35.0, 725.0],& [35.0, 720.0],& [36.0, 714.0],&[36.0, 850.0], &[37.0, 1000.0], &[38.5, 920.0],& [38.5, 955.0], &[39.5, 925.0],& [41.0, 975.0], &[41.0, 950.0], &[9.8, 6.7],&[10.5, 7.5], &[10.6, 7.0],& [11.0, 9.7],&[11.2, 9.8],& [11.3, 8.7], &[11.8, 10.0],& [11.8, 9.9],& [12.0, 9.8],& [12.2, 12.2],& [12.4, 13.4], &[13.0, 12.2], &[14.3, 19.7],&[15.0, 19.9]]
     );
 
 // let y:Vec<f32> =vec![1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-let y:Vec<i32> =vec![1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let mut fish_target: Vec<i32> = vec![1; 35];
+fish_target.extend(vec![0; 14]);
+//90프로를 학습데이터로 사용
+println!("{:?}",fish_data);
+println!("{:?}",fish_target);
+let (x_train, x_test, y_train, y_test) = train_test_split(&fish_data, &fish_target, 0.2, true,None);
 
-let (x_train, x_test, y_train, y_test) = train_test_split(&x, &y, 0.2, true,None);
+let mut knn: KNNClassifier<f32, i32, DenseMatrix<f32>, Vec<i32>, smartcore::metrics::distance::euclidian::Euclidian<f32>> = KNNClassifier::fit(&x_train, &y_train, Default::default()).unwrap();
 
-let mut knn = KNNClassifier::fit(&x_train, &y_train, Default::default()).and_then(|knn| knn.predict(&x_test)).unwrap();    
-let dd: ArrayBase<OwnedRepr<i32>, Dim<[usize; 1]>>= Array::from(knn);
-// Calculate test error
-let array1_f32: Array1<f64> = Array1::from(y_test.iter().map(|&x| x as f64).collect::<Vec<f64>>());
-// let array2_f32: Array1<f64> = Array1::from(knn.iter().map(|&x| x as f64).collect::<Vec<f64>>());
-let y_true: Vec<i32> = vec![0, 1, 0, 1, 1];
-let y_pred_probabilities: Vec<f64> = vec![0.2, 0.8, 0.3, 0.7, 0.9];
+let y_pred = knn.predict(&x_test).unwrap();
+let y_test_f64: Vec<f64> = y_test.iter().map(|&x| x as f64).collect();
+let y_pred_f64: Vec<f64> = y_pred.iter().map(|&x| x as f64).collect();
 
-// Vec를 ndarray::Array1로 변환
-let y_true_array: Array1<f64> = Array::from(y_true.iter().map(|&x| x as f64).collect::<Vec<f64>>());
-let y_pred_array: Array1<f64> = Array::from(y_pred_probabilities.clone());
+let auc = roc_auc_score(&y_test_f64, &y_pred_f64);
+println!("{}",auc);
 // ROC AUC score 계산
-let array1_f64: Vec<f64> = y_test.iter().map(|&x| x as f64).collect();
+
+// let score: f64 = roc_auc_score(&y_test,&x_test);
+let correct = y_pred.iter().zip(y_test.iter()).filter(|&(a, b)| a == b).count();
+let accuracy = correct as f64 / y_test.len() as f64;
+// let accuracy: f64 = accuracy(&y_test, &y_pred);
+println!("Accuracy: {:.?}", y_pred);
+
+println!("Accuracy: {:.2}", accuracy);
+
 // let y_true: Vec<i32> = vec![0, 1, 0, 1, 1];
 
 // Vec를 ndarray::Array1로 변환
-let y_true_array: Vec<f64> = y_true.iter().map(|&x| x as f64).collect();
-let y_pred_array: Vec<f64> = y_pred_probabilities.clone();
+// let y_pred_array: Vec<f64> = vec![0.2, 0.8, 0.3, 0.7, 0.9];
 
-// ROC AUC score 계산
-let auc = roc_auc_score(&y_true_array, &y_pred_array);
+
+
+
+//둘다 Vec<f64>이어야함 고장
+//y_test
+// let auc = roc_auc_score(&y_test_f64, &knn_f64);
 
 // 결과 출력
-println!("ROC AUC: {:?}", auc);
+// println!("ROC AUC: {:?}", auc);
+// let kn49 = KNNClassifier::new(49);
+
 // 결과 출력
 }
-// fn main(){
-//     use smartcore::dataset::*;
-// // DenseMatrix wrapper around Vec
-// use smartcore::linalg::naive::dense_matrix::DenseMatrix;
-// // Imports for KNN classifier
-// use smartcore::neighbors::knn_classifier::KNNClassifier;
-// // Model performance
-// use smartcore::metrics::roc_auc_score;
-// use smartcore::model_selection::train_test_split;
-// // Load dataset
-// let cancer_data = breast_cancer::load_dataset();
-// // Transform dataset into a NxM matrix
-// let x: DenseMatrix<f32> = DenseMatrix::from_array(
-//     cancer_data.num_samples,
-//     cancer_data.num_features,
-//     &cancer_data.data,
-// );
-// // These are our target class labels
-// let y = cancer_data.target;
-// // Split dataset into training/test (80%/20%)
-// let (x_train, x_test, y_train, y_test) = train_test_split(&x, &y, 0.2, true);
-// // KNN classifier
-// let y_hat_knn = KNNClassifier::fit(
-//     &x_train,
-//     &y_train,        
-//     Default::default(),
-// ).and_then(|knn| knn.predict(&x_test)).unwrap();    
-// // Calculate test error
-// println!("AUC: {}", roc_auc_score(&y_test, &y_hat_knn));
-// }
+/*
+from sklearn.neighbors import KNeighborsClassifier
+kn= KNeighborsClassifier()
+kn.fit(fish_data,fish_target)
+kn.score(fish_data,fish_target)
+ */
