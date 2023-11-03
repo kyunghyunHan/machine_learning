@@ -3,7 +3,7 @@ use ndarray::prelude::*;
 use smartcore::metrics::*;
 use smartcore::linalg::basic::matrix::DenseMatrix;
 use smartcore::neighbors::knn_classifier::*;
-
+use smartcore::model_selection::train_test_split;
 
 pub fn main() {
     // 도미 데이터
@@ -80,14 +80,19 @@ let fish_data: DenseMatrix<f32> = DenseMatrix::from_2d_array(&[
 // let y:Vec<f32> =vec![1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
 let mut fish_target: Vec<i32> = vec![1; 35];
 fish_target.extend(vec![0; 14]);
-//90프로를 학습데이터로 사용
-// let (x_train, x_test, y_train, y_test) = train_test_split(&fish_data, &fish_target, 0.2,true,None);
+///훈련용과 테스트용
+//x를 훈련용
+//y를 테스트용
+let (train_input, test_input, tarin_target, test_target) = train_test_split(&fish_data, &fish_target, 0.2,true,None);
 
-let  knn: KNNClassifier<f32, i32, DenseMatrix<f32>, Vec<i32>, smartcore::metrics::distance::euclidian::Euclidian<f32>> = KNNClassifier::fit(&fish_data, &fish_target, Default::default()).unwrap();
+// let  knn: KNNClassifier<f32, i32, DenseMatrix<f32>, Vec<i32>, smartcore::metrics::distance::euclidian::Euclidian<f32>> = KNNClassifier::fit(&fish_data, &fish_target, Default::default()).unwrap();
+let  knn: KNNClassifier<f32, i32, DenseMatrix<f32>, Vec<i32>, smartcore::metrics::distance::euclidian::Euclidian<f32>> = KNNClassifier::fit(&train_input, &tarin_target, Default::default()).unwrap();
 
 let y_pred = knn.predict(&fish_data).unwrap();
+// let y_pred = knn.predict(&fish_data).unwrap();
 
-let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&fish_target, &y_pred);
+// let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&fish_target, &y_pred);
+let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&test_target, &y_pred);
 
 println!("Accuracy: {}", acc);
 }
