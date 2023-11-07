@@ -13,3 +13,99 @@ fish_weight = [242.0, 290.0, 340.0, 363.0, 430.0, 450.0, 500.0, 390.0, 450.0, 50
 import numpy as np
 
 np.colum_stack(([1,2,3],[4,5,6]))
+
+fish_data = np.colum_stack((fish_data,fish_weight))
+
+print(np,ones(5))
+
+fish_target = np.concatenate((np.ones(35),np.zeros(14)))
+
+from sklearn.model_selection import train_test_split
+#기본적으로 25%를 테스트 세트로 뗴어냅니다
+train_input,test_input,train_target,test_target= train_test_split(
+    fish_data,fish_target,stratify = fish_target, random_state= 42
+)
+
+
+from sklearn.neighbors import KNeighborsClassifier
+
+kn.KNeighborsClassifier()
+kn.fit(train_input,test_target)
+
+kn.score(train_input,test_target)
+#이상하게나옴 빙어처럼나옴
+print(kn.predict([[25,150]]))
+
+import matplotlib.pyplot as plt
+
+plt.scatter(train_input[:, 0], train_input[:, 1])
+plt.scatter(25,10,market='^')#marker매개변수는 모양을 지정합니다
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
+plt.scatter(train_input[:, 0], train_input[:, 1])
+plt.scatter(25,10,market='^')#marker매개변수는 모양을 지정합니다
+plt.scatter(train_input[indexes,0],train_input[indexes,1],marker='D')
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
+
+print(train_input[indexes])
+
+print(train_target[indexes])
+
+print(distances)
+
+
+plt.scatter(train_input[:, 0], train_input[:, 1])
+plt.scatter(25,10,market='^')#marker매개변수는 모양을 지정합니다
+plt.scatter(train_input[indexes,0],train_input[indexes,1],marker='D')
+plt.xlim((0,1000))
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
+#전처리 방법중 하나는 표준점수
+#표준점수와 표준편차
+#분산은 데이터에서 평균을 뺀값을 모두 제곱한 다음 평균을 내어 구합니다
+# 표준편차는 분산의 제곱근으로 데이터가 분산된 정도를 나타냅니다
+#표준 점수는 각 데이터가 원점에서 표준편차만큼 떨어져 있는지를 나타내는 값입니다.
+#평군 계산
+mean = np.mean(train_input,axis=0)#axis=0:행을 따라 각 열의 통계값 산
+#표준 편차 계산
+std= np.std(train_input,axis=0)
+#브로드캐스팅
+train_scaled= (train_input-maen)/std
+
+
+plt.scatter(train_input[:, 0], train_input[:, 1])
+plt.scatter(25,10,market='^')#marker매개변수는 모양을 지정합니다
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
+new= ([25,150]-mean)/std
+plt.scatter(train_input[:, 0], train_input[:, 1])
+plt.scatter(new[0],new[1],market='^')#marker매개변수는 모양을 지정합니다
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+#후련을 마치고 테스트세트로 평가할떄는 테스트세트도 훈련세트의 평균과 표준편차로 변환해야한다
+kn.fit(train_scaled,train_target)
+
+test_scaled= (test_input-mean)/std
+
+kn.score(test_scaled,test_target)
+
+print(kn.predict([new]))
+
+distances,indexes= kn.kneighbors([new])
+plt.scatter(train_input[:, 0], train_input[:, 1])
+plt.scatter(new[0],new[1],market='^')#marker매개변수는 모양을 지정합니다
+plt.scatter(train_scaled[indexes,0],train_scaled[indexes,1],marker='D')
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
