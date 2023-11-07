@@ -1,5 +1,6 @@
-mod pish;
+mod fish;
 
 fn main(){
-pish::pish::main();
+// fish::pish::main();
+fish::fish01::main();
 }

@@ -77,7 +77,7 @@ print(35/49)
 
 kn = KNeighborsClassifier()
 kn.fit(fish_data, fish_target)
-
+# 정확도= (정확히 맞힌 개수)/(전체 데이터 개수)
 for n in range(5, 50):
     # 최근접 이웃 개수 설정
     kn.n_neighbors = n
