@@ -26,7 +26,7 @@ pub fn main() {
     ];
 
     // Create a scatter plot
-    let root = BitMapBackend::new("scatter_plot.png", (800, 600)).into_drawing_area();
+    let root = BitMapBackend::new("./src/chart/chart01.png", (800, 600)).into_drawing_area();
     root.fill(&WHITE).unwrap();
 
     let x_range = 0.0..45.0; // Adjust the x-axis range based on your data
