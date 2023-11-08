@@ -1,5 +1,6 @@
 use polars::prelude::*;
-
+use ndarray::prelude::*;
+use polars::prelude::DataFrame;
 pub fn main(){
     let df = CsvReader::from_path("./datasets/iris.csv")
     .unwrap()
@@ -12,4 +13,7 @@ pub fn main(){
 //     .select(["SepalWidthCm"])
 //     .mean().unwrap();
 println!("{}", df);
+let ndarray = df.to_ndarray::<Float64Type>(IndexOrder::Fortran).unwrap();
+println!("{}", ndarray);
+
 }

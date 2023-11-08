@@ -1088,6 +1088,7 @@ dependencies = [
  "ndarray",
  "plotters",
  "polars",
+ "polars-core",
  "smartcore",
 ]
 
@@ -1468,6 +1469,7 @@ dependencies = [
  "either",
  "hashbrown 0.14.2",
  "indexmap 2.0.2",
+ "ndarray",
  "num-traits",
  "once_cell",
  "polars-arrow",
