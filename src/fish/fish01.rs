@@ -1,10 +1,10 @@
 use ndarray::prelude::*;
-use ndarray::concatenate;
-use ndarray::stack;
+use smartcore::metrics::*;
 use smartcore::linalg::basic::matrix::DenseMatrix;
 use smartcore::neighbors::knn_classifier::*;
 use smartcore::model_selection::train_test_split;
-use ndarray::{Array2, Axis};
+use ndarray::concatenate;
+use ndarray::stack;
 
 pub fn main(){
     let bream_length = arr1(&[
@@ -30,19 +30,27 @@ pub fn main(){
     let length: ArrayBase<ndarray::OwnedRepr<f64>, Dim<[usize; 1]>>=concatenate![Axis(0), bream_length, smelt_length];
     let weight: ArrayBase<ndarray::OwnedRepr<f64>, Dim<[usize; 1]>>=concatenate![Axis(0), bream_weight, smelt_weight];
 
-    let fish_data: ArrayBase<ndarray::OwnedRepr<f64>, Dim<[usize; 2]>> = stack![Axis(1), length, weight];
+    let  fish_data: ArrayBase<ndarray::OwnedRepr<f64>, Dim<[usize; 2]>> = stack![Axis(1), length, weight];
 
     println!("{}",fish_data);
 
     let mut fish_target: Vec<i32> = vec![1; 35];
-    let rust_array: Vec<f64> = fish_data.into_raw_vec();
+    // let rust_array: Vec<f64> = fish_data.into_raw_vec();
     fish_target.extend(vec![0; 14]);
-    let arr: Vec<Vec<f64>> = vec![vec![1.0, 2.0]];
-
-    let arr_slice: Vec<&[_]> = arr.iter().map(|row| row.as_slice()).collect();
-
+    let mut data: Vec<Vec<_>> = Vec::new();
+    for row in fish_data.outer_iter() {
+        let row_vec: Vec<_> = row.iter().cloned().collect();
+        data.push(row_vec);
+    }
+    let fish_dense_data: DenseMatrix<f64> = DenseMatrix::from_2d_vec(&data);
     // DenseMatrix를 초기화합니다.
+    let (train_input, test_input, tarin_target, test_target) = train_test_split(&fish_dense_data, &fish_target, 0.2,true,None);
 
     // 2차원 배열의 슬라이스로 DenseMatrix를 초기화합니다.
-    let test = DenseMatrix::from_2d_array(&arr_slice);
+    let knn= KNNClassifier::fit(&train_input, &tarin_target, Default::default()).unwrap();
+    let y_pred = knn.predict(&test_input).unwrap();
+
+    let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&test_target, &y_pred);
+    println!("{:?}",knn.predict(&test_input).unwrap());
+  
     }
