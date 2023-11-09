@@ -22,14 +22,14 @@ fish_weight = [242.0, 290.0, 340.0, 363.0, 430.0, 450.0, 500.0, 390.0, 450.0, 50
 
 ## 하나의 생성 데이터를 샘플이라 부릅니다.
 ## 35개를 데이터세트 14개를 테스트세트
-fish_data = [[l, w] for l, w in zip(length, weight)]
+fish_data = [[l, w] for l, w in zip(fish_length, fish_weight)]
 fish_target = [1]*35 + [0]*14
 
 from sklearn.neighbors import KNeighborsClassifier
 kn = KNeighborsClassifier()
 
-print(fish_data[4])#29.9,430.9
-
+print(fish_data[4])#29.0,430.0
+#파이썬 리스트는 인덱스 외에도 슬라이싱 이는 특별한 연산자
 print(fish_data[0:5])
 
 print(fish_data[:5])
@@ -49,8 +49,10 @@ test_target = fish_target[35:]
 #모델 훈련
 kn.fit(train_input, train_target)
 ##정확도0 = 샘플링 편향 ,치우쳐졋기때문에
+##samplinng bias
 kn.score(test_input, test_target)
-
+#Own Dimension:벡터
+#Two Dimension :matrix
 import numpy as np
 
 input_arr = np.array(fish_data)
@@ -61,7 +63,7 @@ print(input_arr.shape)#샘플수,특성수
 #
 np.random.seed(42)
 index = np.arange(49)#0부터 48까지 1씩 증가하는 인덱스
-np.random.shuffle(index)# 석기
+np.random.shuffle(index)#  shuffle
 
 print(index)
 
@@ -91,3 +93,10 @@ kn.score(test_input, test_target)
 kn.predict(test_input)
 
 test_target
+
+#지도학습은 입력과 타깃을 입력하여 새로운데이터를 예측하는데 활용
+#비지도학습은 타깃데이터가 없으므로 특징을 찾는데 주로활용
+#훈련세트 :모델을 훈련훈련세트가 클수록 좋음
+#테스트세트:전체데이터에서 20%사용하는것이 좋음
+#seed:넘파이에서 난수생성
+#arange()일정한 간격의 정수 또는 실수배열
