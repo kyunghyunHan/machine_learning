@@ -1,110 +1,153 @@
 
 #특성공학
+#선형회귀는 특성이 많을수록 좋음
+
+#다중회귀
+#특성이 2개면 선형회귀는 평면을 학습
+#특성이 2개면 타깃값과 함계 3차원 공간형성
+#타깃 = a x 특성1 x 특성2+절편은 평면
+#특성이 많은 고차원에서는 선형회귀가 매우 복잡한 모델을 표현할수 있다
+#농어의 길이 + 농어의 높이 +두께
+# 농어길이  * 농어 높이 새로운 특성으로 재탄생->특성공학
 import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
 import pandas as pd
-fish = pd.read_csv('https://bit.ly/fish_csv_data')
-fish.head()
-print(pd.unique(fish['Species']))
-
-fish_input = fish[['Weight','Length','Diagonal','Height','Width']].to_numpy()
-print(fish_input[:5])
-
-fish_target = fish['Species'].to_numpy()
+df = pd.read_csv('https://bit.ly/perch_csv_data')
+prech_full = df.to_numpy()
+print(prech_full)
 
 
+import numpy as np
+
+perch_weight = np.array([5.9, 32.0, 40.0, 51.5, 70.0, 100.0, 78.0, 80.0, 85.0, 85.0, 110.0,
+       115.0, 125.0, 130.0, 120.0, 120.0, 130.0, 135.0, 110.0, 130.0,
+       150.0, 145.0, 150.0, 170.0, 225.0, 145.0, 188.0, 180.0, 197.0,
+       218.0, 300.0, 260.0, 265.0, 250.0, 250.0, 300.0, 320.0, 514.0,
+       556.0, 840.0, 685.0, 700.0, 700.0, 690.0, 900.0, 650.0, 820.0,
+       850.0, 900.0, 1015.0, 820.0, 1100.0, 1000.0, 1100.0, 1000.0,
+       1000.0])
+
+#훈련세트와 테스트 세트 나누기
 from sklearn.model_selection import train_test_split
+
 train_input,test_input,train_target,test_target= train_test_split(
-    fish_input,fish_target, random_state= 42
+    prech_full,perch_weight, random_state= 42
 )
 
-#전처리
+#사이킷런 변환기
+
+from sklearn.preprocessing import PolynomialFeatures
+#변환기는 타깃데이터가 필요없음
+#PolynomialFeatures는 각 특성을  제곱한 항을 추가하고 특성끼리 서로 곱한 항을 추가
+# 무게 = a * 길이 +b *높이 +c * 두께 +d *1
+#선형방정식의 절편은 항상 값이 1인 특성과 곱해지는 계수
+poly=PolynomialFeatures(include_bias=False)
+poly.fit([[2,3]])
+print(poly.transform([[2,3]]))
+
+poly=PolynomialFeatures(include_bias=False)
+poly.fit(train_input)
+train_poly = poly.transform(train_input)
+print(train_poly.shape)
+
+#각각 특성이 어떤입력의 조합으로 이루어졋는지 확인가능
+poly.get_feature_names_out()
+
+test_poly= poly.transform(test_input)
+
+
+from sklearn.linear_model import LinearRegression
+lr = LinearRegression()
+
+#선형회귀 모델 훈련
+lr.fit(train_poly,train_target)
+print(lr.score(train_poly,train_target))
+print(lr.score(test_poly,test_target))
+
+#특성 추가
+
+poly=PolynomialFeatures(degree=5,include_bias=False)
+poly.fit(train_input)
+train_poly = poly.transform(train_input)
+test_poly= poly.transform(test_input)
+#특성 55개
+print(train_poly.shape)
+lr.fit(train_poly,train_target)
+print(lr.score(train_poly,train_target))
+#선형모델은특성의 개수를 늘리면 훈련에대해 완벽하지만 과대적합대므로 테스트 세트에서는 형편없는 점수
+print(lr.score(test_poly,test_target))#음수가나옴
+
+#규제
+#머신모델이 훈련세트를 과도하게 학습하지 못하도록 훼방
+
 from sklearn.preprocessing import StandardScaler
-ss = StandardScaler()
-ss.fit(train_input)
-train_scaled=ss.transform(train_input)
-test_scaled=ss.transform(test_input)
+ss= StandardScaler()
+ss.fit(train_poly)
+train_scaled = ss.transform(train_poly)
+test_scaled = ss.transform(test_poly)
 
-# 최근접 이웃 분류기의 확률 예측
-from sklearn.neighbors import KNeighborsClassifier
+#선형회귀에 규제를 추가한 모델을 릿지와 라쏘
 
-kn= KNeighborsClassifier()
-kn.fit(train_scaled,train_target)
-print(kn.score(train_scaled,train_target))
-print(kn.score(test_scaled,test_target))
 
-print(kn.classes_)
-print(kn.predict(test_scaled[:5]))
+from sklearn.linear_model import Ridge
+ridge= Ridge()
+ridge.fit(train_scaled,train_target)
+print(ridge.score(train_scaled,train_target))
+print(ridge.score(test_scaled,test_target))
 
-import numpy as np
-proba= kn.predict_proba(test_scaled[:5])
-print(np.round(proba,decimals=4))
 
-distances,indexes = kn.kneighbors(test_scaled[3:4])
-print(train_target[indexes])
-# 로지스틱 회귀
-import numpy as np
 import matplotlib.pyplot as plt
-z= np.arange(-5,5,0.1)
-phi= 1/(1+np.exp(-z))
-plt.plot(z,phi)
-plt.xlabel('z')
-plt.ylabel('phi')
+train_score=[]
+test_score=[]
+
+alpha_list=[0.001,0.01,0.1,1,10,100]
+
+for alpha in alpha_list:
+    #릿지 모델을 만듭니다
+    ridge= Ridge(alpha=alpha)
+    #릿지모델을 훈련
+    ridge.fit(train_scaled,train_target)
+    #훈련 점수와 테스트 점수를 저장
+    train_score.append(ridge.score(train_scaled,train_target))
+    test_score.append(ridge.score(test_scaled,test_target))
+
+plt.plot(np.log10(alpha_list),train_score)
+plt.plot(np.log10(alpha_list),test_score)
+plt.xlabel('alpha')
+plt.ylabel('R^2')
 plt.show()
-#로지스틱 회귀로 이진분류 수행
-char_arr = np.array(['A', 'B', 'C', 'D', 'E'])
-print(char_arr[[True, False, True, False, False]])
 
-from sklearn.linear_model import LogisticRegression
+ridge= Ridge(alpha=0.1)
+ridge.fit(train_scaled,train_target)
+print(ridge.score(train_scaled,train_target))
+print(ridge.score(test_scaled,test_target))
 
-lr = LogisticRegression()
-lr.fit(train_bream_smelt, target_bream_smelt)
+#라쏘회귀
 
-bream_smelt_indexes = (train_target == 'Bream') | (train_target == 'Smelt')
-train_bream_smelt = train_scaled[bream_smelt_indexes]
-target_bream_smelt = train_target[bream_smelt_indexes]
+from sklearn.linear_model import Lasso
+lasso= Lasso()
+lasso.fit(train_scaled,train_target)
+print(lasso.score(train_scaled,train_target))
 
-print(lr.predict(train_bream_smelt[:5]))
+print(lasso.score(test_scaled,test_target))
 
-print(lr.predict_proba(train_bream_smelt[:5]))
+train_score=[]
+test_score=[]
 
-print(lr.classes_)
+alpha_list=[0.001,0.01,0.1,1,10,100]
 
-print(lr.coef_, lr.intercept_)
+for alpha in alpha_list:
+    #릿지 모델을 만듭니다
+    lasso= Lasso(alpha=alpha,max_iter=10000)
+    #릿지모델을 훈련
+    lasso.fit(train_scaled,train_target)
+    #훈련 점수와 테스트 점수를 저장
+    train_score.append(lasso.score(train_scaled,train_target))
+    test_score.append(lasso.score(test_scaled,test_target))
 
-decisions = lr.decision_function(train_bream_smelt[:5])
-print(decisions)
-
-from scipy.special import expit
-
-print(expit(decisions))
-# 로지스틱 회귀로 다중 분류 수행
-lr = LogisticRegression(C=20, max_iter=1000)
-lr.fit(train_scaled, train_target)
-
-print(lr.score(train_scaled, train_target))
-print(lr.score(test_scaled, test_target))
-
-print(lr.predict(test_scaled[:5]))
-
-proba = lr.predict_proba(test_scaled[:5])
-print(np.round(proba, decimals=3))
-
-print(lr.classes_)
-
-print(lr.coef_.shape, lr.intercept_.shape)
-#z1~z7까징의 값을 구한다음
-decision = lr.decision_function(test_scaled[:5])
-print(np.round(decision, decimals=2))
-
-from scipy.special import softmax
-#softmax의 axis매개변수는 소프트맥스를 계산할 축을 지정 1로 지정하여 각 행,각 샘플에 대해 소프트맥스 계산 axis를 지정하지 않음녀 배열전체에대해 계산
-proba = softmax(decision, axis=1)
-print(np.round(proba, decimals=3))
-# k-최근접 이웃모델이 확률을 출력할수 있지만 이웃한 샘플의 클래스비율이므로 항상 정해진 확률만 출력
-
-# 로지스틱 회귀(분류모델)는 이진 분류에서는 하나의 선형방정식을 훈련 
-# 출력값을 시그모이드 함수에 통과시켜 0에서 1사이의 값을 생성,이 값이 양성 클래스에 대한 확률,음성 클래스의 확률은 1에서 양성클래스의 확률 뺴기
-# 다중 분류일 경우 클래스 개수만큼 방정식 훈련
-# 그다음 각 방정식의 출력값을 소프트맥스 함수를 통과시켜 전체 클래스의 합이 항상 1이되도록
+plt.plot(np.log10(alpha_list),train_score)
+plt.plot(np.log10(alpha_list),test_score)
+plt.xlabel('alpha')
+plt.ylabel('R^2')
+plt.show()
