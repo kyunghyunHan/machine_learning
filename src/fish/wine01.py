@@ -9,13 +9,14 @@ wine.head()
 # 데이터 프레임의 각 열의 데이터 타입과 누락된 데이터가 있는지 확인하는데 유용
 wine.info()
 
-# 열에 대한 간략한 통계출력
+# 열에 대한 간략한 통계출력,최소 최대 평균값 등을 확인 가능
 # 평균:mean 표준편차:std min,max
 wine.describe()
-
+#numpy배열로 변환
 data= wine[['alcohol','sugar','pH']].to_numpy()
 target= wine['class'].to_numpy()
-
+#훈련세트와 데이터 세트로변환
+#20프로만 테스트세트로변환
 from sklearn.model_selection import train_test_split
 train_input,test_input,train_target,test_target= train_test_split(
     data,target,test_size=0.2 ,random_state= 42
