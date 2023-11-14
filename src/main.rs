@@ -1,6 +1,7 @@
 mod polars_ch;
 mod chart;
 mod fish;
+mod kaggle;
 
 fn main(){
 
@@ -9,7 +10,7 @@ fn main(){
 /*=========chart======== */
 /*=========fish======== */
 // fish::fish01::main();
-fish::wine01::main();
+// fish::wine01::main();
 /*=========fish======== */
 
 /*=========wine======== */
@@ -18,5 +19,9 @@ fish::wine01::main();
 /*=========polars======== */
 // polars_ch::polars_ch01::main();
 /*=========polars======== */
+/*=========kaggle======== */
+kaggle::titanic_beginner::main();
+/*=========kaggle======== */
+
 
 }
