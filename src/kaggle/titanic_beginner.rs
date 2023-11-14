@@ -16,5 +16,6 @@ pub fn main(){
    let value_counts = train_df.column("Pclass").unwrap().value_counts(false,false).unwrap();
    println!("{}",value_counts);
 
-
+   
+    
 }
