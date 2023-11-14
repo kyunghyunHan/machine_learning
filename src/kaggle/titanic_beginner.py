@@ -1,6 +1,9 @@
 # 필요한 라이브러리를 우선 불러옵니다.
 
 ## 데이터 분석 관련
+# 필요한 라이브러리를 우선 불러옵니다.
+
+## 데이터 분석 관련
 import pandas as pd
 from pandas import Series, DataFrame
 import numpy as np
@@ -20,8 +23,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 
 # 데이터를 우선 가져와야합니다.
-train_df = pd.read_csv("../titanic/train.csv")
-test_df = pd.read_csv("../titanic/test.csv")
+train_df = pd.read_csv("../dataset/titanic/train.csv")
+test_df = pd.read_csv("../dataset/titanic/test.csv")
 
 # 데이터 미리보기
 train_df.head()
@@ -34,6 +37,8 @@ test_df.info()
 train_df = train_df.drop(['PassengerId', 'Name', 'Ticket'], axis=1)
 test_df = test_df.drop(['Name','Ticket'], axis=1)
 
+train_df['Pclass'].value_counts()
+
 pclass_train_dummies = pd.get_dummies(train_df['Pclass'])
 pclass_test_dummies = pd.get_dummies(test_df['Pclass'])
 
@@ -42,3 +47,69 @@ test_df.drop(['Pclass'], axis=1, inplace=True)
 
 train_df = train_df.join(pclass_train_dummies)
 test_df = test_df.join(pclass_test_dummies)
+
+
+
+sex_train_dummies = pd.get_dummies(train_df['Sex'])
+sex_test_dummies = pd.get_dummies(test_df['Sex'])
+
+sex_train_dummies.columns = ['Female', 'Male']
+sex_test_dummies.columns = ['Female', 'Male']
+
+train_df.drop(['Sex'], axis=1, inplace=True)
+test_df.drop(['Sex'], axis=1, inplace=True)
+
+train_df = train_df.join(sex_train_dummies)
+test_df = test_df.join(sex_test_dummies)
+
+train_df["Age"].fillna(train_df["Age"].mean() , inplace=True)
+test_df["Age"].fillna(train_df["Age"].mean() , inplace=True)
+
+test_df["Fare"].fillna(0, inplace=True)
+
+
+train_df = train_df.drop(['Cabin'], axis=1)
+test_df = test_df.drop(['Cabin'], axis=1)
+
+train_df['Embarked'].value_counts()
+
+test_df['Embarked'].value_counts()
+
+
+train_df["Embarked"].fillna('S', inplace=True)
+test_df["Embarked"].fillna('S', inplace=True)
+
+embarked_train_dummies = pd.get_dummies(train_df['Embarked'])
+embarked_test_dummies = pd.get_dummies(test_df['Embarked'])
+
+embarked_train_dummies.columns = ['S', 'C', 'Q']
+embarked_test_dummies.columns = ['S', 'C', 'Q']
+
+train_df.drop(['Embarked'], axis=1, inplace=True)
+test_df.drop(['Embarked'], axis=1, inplace=True)
+
+train_df = train_df.join(embarked_train_dummies)
+test_df = test_df.join(embarked_test_dummies)
+
+X_train = train_df.drop("Survived",axis=1)
+Y_train = train_df["Survived"]
+X_test  = test_df.drop("PassengerId",axis=1).copy()
+
+
+# Logistic Regression
+
+logreg = LogisticRegression()
+logreg.fit(X_train, Y_train)
+
+Y_pred = logreg.predict(X_test)
+
+logreg.score(X_train, Y_train)
+
+
+svc = SVC()
+
+svc.fit(X_train, Y_train)
+
+Y_pred = svc.predict(X_test)
+
+svc.score(X_train, Y_train)
