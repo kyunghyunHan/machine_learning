@@ -63,7 +63,7 @@ train_df = train_df.join(sex_train_dummies)
 test_df = test_df.join(sex_test_dummies)
 
 train_df["Age"].fillna(train_df["Age"].mean() , inplace=True)
-test_df["Age"].fillna(train_df["Age"].mean() , inplace=True)
+test_df["Age"].fillna(test_df["Age"].mean() , inplace=True)
 
 test_df["Fare"].fillna(0, inplace=True)
 
@@ -95,10 +95,14 @@ X_train = train_df.drop("Survived",axis=1)
 Y_train = train_df["Survived"]
 X_test  = test_df.drop("PassengerId",axis=1).copy()
 
+X_train.columns = X_train.columns.astype(str)
+X_test.columns = X_test.columns.astype(str)
+
+# print(X_train)
 
 # Logistic Regression
 
-logreg = LogisticRegression()
+logreg = LogisticRegression(max_iter=1000)
 logreg.fit(X_train, Y_train)
 
 Y_pred = logreg.predict(X_test)
@@ -113,3 +117,31 @@ svc.fit(X_train, Y_train)
 Y_pred = svc.predict(X_test)
 
 svc.score(X_train, Y_train)
+
+random_forest = RandomForestClassifier(n_estimators=100)
+
+random_forest.fit(X_train, Y_train)
+
+Y_pred = random_forest.predict(X_test)
+
+random_forest.score(X_train, Y_train)
+
+
+knn = KNeighborsClassifier(n_neighbors = 3)
+
+knn.fit(X_train, Y_train)
+
+Y_pred = knn.predict(X_test)
+
+knn.score(X_train, Y_train)
+
+random_forest = RandomForestClassifier(n_estimators=100)
+random_forest.fit(X_train, Y_train)
+Y_pred = random_forest.predict(X_test)
+random_forest.score(X_train, Y_train)
+
+submission = pd.DataFrame({
+        "PassengerId": test_df["PassengerId"],
+        "Survived": Y_pred
+    })
+submission.to_csv('titanic.csv', index=False)
