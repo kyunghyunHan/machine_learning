@@ -5,6 +5,7 @@
 
 ## 데이터 분석 관련
 import pandas as pd
+# import polars as pl
 from pandas import Series, DataFrame
 import numpy as np
 
@@ -32,10 +33,25 @@ train_df.head()
 train_df.info()
 print('-'*20)
 test_df.info()
+#빈 부분이 많다면 삭제
+#cabin, Age, Embarked 세 항목에 주의
 
 
 train_df = train_df.drop(['PassengerId', 'Name', 'Ticket'], axis=1)
 test_df = test_df.drop(['Name','Ticket'], axis=1)
+
+
+"""
+Pclass
+Sex
+Age
+SibSp
+Parch
+Fare
+Cabin
+Embarked
+"""
+
 
 train_df['Pclass'].value_counts()
 
