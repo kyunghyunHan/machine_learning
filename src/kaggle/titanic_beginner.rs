@@ -116,13 +116,12 @@ println!("test_df:{:?}",test_df);
 */
 
 println!("{}",train_df.column("Embarked").unwrap().value_counts(true,false).unwrap());
-let mut  train_df= train_df.with_column(  train_df.column("Embarked").unwrap().fill_null(FillNullStrategy::Min).unwrap()).unwrap();
+let mut  train_df: &mut DataFrame= train_df.with_column(  train_df.column("Embarked").unwrap().fill_null(FillNullStrategy::Backward(None)).unwrap()).unwrap();
 println!("{}",train_df.column("Embarked").unwrap().value_counts(true,false).unwrap());
 
 /*데이터 나누기 */
 
 /*알고리즘 적용 */
-
 
 /*제출용 파일 */
 let mut output_file: File = File::create("./datasets/titanic_beginner/out.csv").unwrap();
