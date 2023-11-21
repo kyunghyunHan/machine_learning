@@ -1,11 +1,14 @@
 
-use ndarray::{Axis, iter::Axes};
+use ndarray::{Axis, iter::Axes,concatenate,stack};
 use polars::prelude::*;
 use polars_core::prelude::*;
 use polars_io::prelude::*;
 use std::fs::File;
-use chrono::prelude::*;
+use smartcore::neighbors::knn_classifier::*;
+use smartcore::linalg::basic::matrix::DenseMatrix;
+use smartcore::model_selection::train_test_split;
 
+use smartcore::metrics::*;
 use polars::prelude::{CsvWriter, DataFrame, NamedFrom, SerWriter, Series};
 
 pub fn main(){
@@ -118,11 +121,49 @@ println!("test_df:{:?}",test_df);
 println!("{}",train_df.column("Embarked").unwrap().value_counts(true,false).unwrap());
 let mut  train_df: &mut DataFrame= train_df.with_column(  train_df.column("Embarked").unwrap().fill_null(FillNullStrategy::Backward(None)).unwrap()).unwrap();
 println!("{}",train_df.column("Embarked").unwrap().value_counts(true,false).unwrap());
+let  mut embarked_train_dummies= train_df.column("Embarked").unwrap().to_dummies(None, false).unwrap();
+let  mut embarked_test_dummies= test_df.column("Embarked").unwrap().to_dummies(None, false).unwrap();
 
+
+let  embarked_train_dummies= embarked_train_dummies.rename("Embarked_C","C").unwrap().rename("Embarked_Q","Q").unwrap().rename("Embarked_S","S").unwrap();
+let  embarked_test_dummies= embarked_test_dummies.rename("Embarked_C","C").unwrap().rename("Embarked_Q","Q").unwrap().rename("Embarked_S","S").unwrap();
+let  mut train_df = train_df.drop("Embarked").unwrap();
+let  mut test_df = test_df.drop("Embarked").unwrap();
+
+for series in embarked_train_dummies.iter(){
+    train_df = train_df.hstack(&[series.clone()]).unwrap();
+}
+for series in embarked_test_dummies.iter(){
+    test_df = test_df.hstack(&[series.clone()]).unwrap();
+}
+let x_train= train_df.drop("Survived").unwrap();//훈련데이터
+let  y_train= train_df.column("Survived").unwrap();//타겟데이터
+let x_test= test_df.drop("PassengerId").unwrap();
+
+
+let  x_train = x_train.to_ndarray::<Float64Type>(IndexOrder::Fortran).unwrap();
+
+
+let mut data: Vec<Vec<_>> = Vec::new();
+for row in x_train.outer_iter() {
+    let row_vec: Vec<_> = row.iter().cloned().collect();
+    data.push(row_vec);
+}
+let x_train: DenseMatrix<f64> = DenseMatrix::from_2d_vec(&data);
+println!("{}",x_train);
+
+let y_train: Vec<i64> = y_train.i64().unwrap().into_no_null_iter().collect();
+let y_train= y_train.iter().map(|x|*x as i32).collect();
+let (train_input, test_input, tarin_target, test_target) = train_test_split(&x_train, &y_train, 0.2,true,None);
+    
 /*데이터 나누기 */
 
 /*알고리즘 적용 */
+let knn: KNNClassifier<f64, i32, DenseMatrix<f64>, Vec<i32>, distance::euclidian::Euclidian<f64>>= KNNClassifier::fit(&train_input, &tarin_target, Default::default()).unwrap();
+let y_pred = knn.predict(&test_input).unwrap();
 
+let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&test_target, &y_pred);
+println!("{:?}",knn.predict(&test_input).unwrap());
 /*제출용 파일 */
 let mut output_file: File = File::create("./datasets/titanic_beginner/out.csv").unwrap();
 CsvWriter::new(&mut output_file)

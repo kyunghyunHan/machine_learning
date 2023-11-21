@@ -47,7 +47,7 @@ pub fn main(){
     let (train_input, test_input, tarin_target, test_target) = train_test_split(&fish_dense_data, &fish_target, 0.2,true,None);
 
     // 2차원 배열의 슬라이스로 DenseMatrix를 초기화합니다.
-    let knn= KNNClassifier::fit(&train_input, &tarin_target, Default::default()).unwrap();
+    let knn: KNNClassifier<f64, i32, DenseMatrix<f64>, Vec<i32>, distance::euclidian::Euclidian<f64>>= KNNClassifier::fit(&train_input, &tarin_target, Default::default()).unwrap();
     let y_pred = knn.predict(&test_input).unwrap();
 
     let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&test_target, &y_pred);

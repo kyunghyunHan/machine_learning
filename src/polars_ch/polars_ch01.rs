@@ -23,7 +23,7 @@ println!("{}", df.height());
 //col
 println!("{}", df.width());
 //ndarray 로 변환
-let ndarray = df_agg.to_ndarray::<Float64Type>(IndexOrder::Fortran).unwrap();
+let ndarray: ArrayBase<ndarray::OwnedRepr<f64>, Dim<[usize; 2]>> = df_agg.to_ndarray::<Float64Type>(IndexOrder::Fortran).unwrap();
 // println!("{}", ndarray);
 let bream_length = array![
     25.4, 26.3, 26.5, 29.0, 29.0, 29.7, 29.7, 30.0, 30.0, 30.7, 31.0, 31.0,
