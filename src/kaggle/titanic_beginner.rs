@@ -7,7 +7,7 @@ use std::fs::File;
 use smartcore::neighbors::knn_classifier::*;
 use smartcore::linalg::basic::matrix::DenseMatrix;
 use smartcore::model_selection::train_test_split;
-
+use smartcore::linear::logistic_regression::LogisticRegression;
 use smartcore::metrics::*;
 use polars::prelude::{CsvWriter, DataFrame, NamedFrom, SerWriter, Series};
 
@@ -160,12 +160,21 @@ let (train_input, test_input, tarin_target, test_target) = train_test_split(&x_t
 
 /*알고리즘 적용 */
 let knn: KNNClassifier<f64, i32, DenseMatrix<f64>, Vec<i32>, distance::euclidian::Euclidian<f64>>= KNNClassifier::fit(&train_input, &tarin_target, Default::default()).unwrap();
-let y_pred = knn.predict(&test_input).unwrap();
+let y_pred: Vec<i32> = knn.predict(&test_input).unwrap();
 
 let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&test_target, &y_pred);
-println!("{:?}",knn.predict(&test_input).unwrap());
+println!("{:?}",acc);
 /*제출용 파일 */
 let mut output_file: File = File::create("./datasets/titanic_beginner/out.csv").unwrap();
+
+
+/*로지스틱 */
+let logreg= LogisticRegression::fit(&train_input, &tarin_target, Default::default()).unwrap();
+let y_pred: Vec<i32> = logreg.predict(&test_input).unwrap();
+let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&test_target, &y_pred);
+println!("{:?}",acc);
+
+
 CsvWriter::new(&mut output_file)
     .has_header(true)
     .finish(&mut train_df)
