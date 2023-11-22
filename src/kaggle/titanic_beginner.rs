@@ -10,7 +10,8 @@ use smartcore::model_selection::train_test_split;
 use smartcore::linear::logistic_regression::LogisticRegression;
 use smartcore::metrics::*;
 use polars::prelude::{CsvWriter, DataFrame, NamedFrom, SerWriter, Series};
-
+use smartcore::svm::svc::{SVC,SVCParameters};
+use smartcore::ensemble::random_forest_classifier::{RandomForestClassifier,RandomForestClassifierParameters};
 pub fn main(){
     let  train_df: DataFrame = CsvReader::from_path("./datasets/titanic_beginner/train.csv")
     .unwrap()
@@ -143,15 +144,23 @@ let x_test= test_df.drop("PassengerId").unwrap();
 
 let  x_train = x_train.to_ndarray::<Float64Type>(IndexOrder::Fortran).unwrap();
 
+let  x_test = x_test.to_ndarray::<Float64Type>(IndexOrder::Fortran).unwrap();
 
 let mut data: Vec<Vec<_>> = Vec::new();
 for row in x_train.outer_iter() {
     let row_vec: Vec<_> = row.iter().cloned().collect();
     data.push(row_vec);
 }
+
+
+let mut test_data: Vec<Vec<_>> = Vec::new();
+for row in x_test.outer_iter() {
+    let row_vec: Vec<_> = row.iter().cloned().collect();
+    test_data.push(row_vec);
+}
 let x_train: DenseMatrix<f64> = DenseMatrix::from_2d_vec(&data);
 println!("{}",x_train);
-
+let x_test: DenseMatrix<f64>= DenseMatrix::from_2d_vec(&test_data);
 let y_train: Vec<i64> = y_train.i64().unwrap().into_no_null_iter().collect();
 let y_train= y_train.iter().map(|x|*x as i32).collect();
 let (train_input, test_input, tarin_target, test_target) = train_test_split(&x_train, &y_train, 0.2,true,None);
@@ -159,13 +168,13 @@ let (train_input, test_input, tarin_target, test_target) = train_test_split(&x_t
 /*데이터 나누기 */
 
 /*알고리즘 적용 */
-let knn: KNNClassifier<f64, i32, DenseMatrix<f64>, Vec<i32>, distance::euclidian::Euclidian<f64>>= KNNClassifier::fit(&train_input, &tarin_target, Default::default()).unwrap();
+let knn: KNNClassifier<f64, i32, DenseMatrix<f64>, Vec<i32>, distance::euclidian::Euclidian<f64>>= KNNClassifier::fit(&train_input, &tarin_target, KNNClassifierParameters::default().with_k(3)).unwrap();
+
 let y_pred: Vec<i32> = knn.predict(&test_input).unwrap();
 
 let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&test_target, &y_pred);
 println!("{:?}",acc);
-/*제출용 파일 */
-let mut output_file: File = File::create("./datasets/titanic_beginner/out.csv").unwrap();
+
 
 
 /*로지스틱 */
@@ -174,6 +183,31 @@ let y_pred: Vec<i32> = logreg.predict(&test_input).unwrap();
 let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&test_target, &y_pred);
 println!("{:?}",acc);
 
+// /*SVC */
+// let y_pred =  SVC::fit(&x_train, &y_train, &SVCParameters::default().with_c(10.0))
+//     .and_then(|svm| svm.predict(&x_test))
+//     .unwrap();
+// println!("AUC SVM: {}", roc_auc_score(&test_target, &y_pred));
+
+/*랜덤포레스트 */
+let random_forest= RandomForestClassifier::fit(&train_input, &tarin_target, RandomForestClassifierParameters::default().with_n_trees(100)).unwrap();
+let y_pred: Vec<i32> = random_forest.predict(&test_input).unwrap();
+let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&test_target, &y_pred);
+println!("{:?}",acc);
+
+/*제출용 파일 */
+
+let random_forest= RandomForestClassifier::fit(&train_input, &tarin_target, RandomForestClassifierParameters::default().with_n_trees(100)).unwrap();
+let random_forest_y_pred: Vec<i32> = random_forest.predict(&test_input).unwrap();
+
+let survived_series = Series::new("Survived", random_forest_y_pred.into_iter().collect::<Vec<i32>>());
+let passenger_id_series = train_df.column("PassengerId").unwrap().clone();
+
+let df = DataFrame::new(vec![passenger_id_series, survived_series]).unwrap();
+
+println!("{:?}",df);
+
+let mut output_file: File = File::create("./datasets/titanic_beginner/out.csv").unwrap();
 
 CsvWriter::new(&mut output_file)
     .has_header(true)

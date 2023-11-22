@@ -20,7 +20,8 @@ fn main(){
 // polars_ch::polars_ch01::main();
 /*=========polars======== */
 /*=========kaggle======== */
-kaggle::titanic_beginner::main();
+// kaggle::titanic_beginner::main();
+kaggle::iris_beginner::main();
 /*=========kaggle======== */
 
 
