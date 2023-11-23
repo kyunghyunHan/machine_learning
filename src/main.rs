@@ -21,7 +21,7 @@ fn main(){
 /*=========polars======== */
 /*=========kaggle======== */
 // kaggle::titanic_beginner::main();
-kaggle::iris_beginner::main();
+kaggle::iris_beginner::main();//
 /*=========kaggle======== */
 
 
