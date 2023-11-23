@@ -193,7 +193,7 @@ println!("{:?}",acc);
 let random_forest= RandomForestClassifier::fit(&train_input, &tarin_target, RandomForestClassifierParameters::default().with_n_trees(100)).unwrap();
 let y_pred: Vec<i32> = random_forest.predict(&test_input).unwrap();
 let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&test_target, &y_pred);
-println!("{:?}",acc);
+println!("{:?}",test_input);
 
 /*제출용 파일 */
 
@@ -203,7 +203,7 @@ let random_forest_y_pred: Vec<i32> = random_forest.predict(&test_input).unwrap()
 let survived_series = Series::new("Survived", random_forest_y_pred.into_iter().collect::<Vec<i32>>());
 let passenger_id_series = train_df.column("PassengerId").unwrap().clone();
 
-let df = DataFrame::new(vec![passenger_id_series, survived_series]).unwrap();
+let df: DataFrame = DataFrame::new(vec![passenger_id_series, survived_series]).unwrap();
 
 println!("{:?}",df);
 
@@ -213,4 +213,5 @@ CsvWriter::new(&mut output_file)
     .has_header(true)
     .finish(&mut train_df)
     .unwrap();
+
 }
