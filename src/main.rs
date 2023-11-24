@@ -23,6 +23,7 @@ fn main(){
 // kaggle::titanic_beginner::main();
 // kaggle::iris_beginner::main();//
 kaggle::spaceship_beginner::main();
+// kaggle::house_beginner::main();
 /*=========kaggle======== */
 
 
