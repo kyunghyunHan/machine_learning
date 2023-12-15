@@ -20,17 +20,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_ranged(0.0..1.0, 0.0..1.0)?;
 
     // Draw the pie chart using the provided data
-    pie.draw_series(
-        data.iter()
-            .map(|(label, value)| (*label, *value))
-            .map(|(label, value)| {
-                return (label, value);
-            })
-            .into_iter()
-            .map(|(label, value)| {
-                return (      , value, &BLUE);
-            }),
-    )?;
+    // pie.draw_series(
+    //     data.iter()
+    //         .map(|(label, value)| (*label, *value))
+    //         .map(|(label, value)| {
+    //             return (label, value);
+    //         })
+    //         .into_iter()
+    //         .map(|(label, value)| {
+    //             return (      , value, &BLUE);
+    //         }),
+    // )?;
     
     // Save the chart to a file named "plot.png"
     root.present()?;

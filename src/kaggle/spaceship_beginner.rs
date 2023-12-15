@@ -33,4 +33,7 @@ pub fn main(){
 
     println!("데이터 미리보기:{}",train_df.head(None));
     println!("데이터 정보 확인:{:?}",train_df.schema());
+
+    /* 결측치 확인*/
+    println!("{}",train_df.null_count());
 }
