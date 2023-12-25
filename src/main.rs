@@ -7,6 +7,7 @@ fn main(){
 
 /*=========chart======== */
 // chart::chart02::main();
+chart::chart02::main();
 /*=========chart======== */
 /*=========fish======== */
 // fish::fish01::main();
@@ -22,7 +23,7 @@ fn main(){
 /*=========kaggle======== */
 // kaggle::titanic_beginner::main();
 // kaggle::iris_beginner::main();//
-kaggle::spaceship_beginner::main();
+// kaggle::spaceship_beginner::main();
 // kaggle::house_beginner::main();
 /*=========kaggle======== */
 

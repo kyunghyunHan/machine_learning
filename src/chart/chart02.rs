@@ -1,39 +1,32 @@
+/*
+
+제츨파일
+
+PassengerId :PassengerId
+HomePlanet- 승객이 출발한 행성, 일반적으로 영주권이 있는 행성입니다.
+CryoSleep- 승객이 항해 기간 동안 애니메이션을 정지하도록 선택했는지 여부를 나타냅니다. 냉동 수면 중인 승객은 객실에 갇혀 있습니다.
+Cabin- 승객이 머무르는 객실 번호. Port 또는 Starboarddeck/num/side 의 형식 을 취side 합니다 .PS
+Destination- 승객이 내릴 행성.
+Age- 승객의 나이.
+VIP- 승객이 항해 중 특별 VIP 서비스 비용을 지불했는지 여부.
+RoomService, FoodCourt, ShoppingMall, Spa, - 우주선 타이타닉VRDeck 의 다양한 고급 편의 시설 각각에 대해 승객이 청구한 금액입니다 .
+Name- 승객의 이름과 성.
+Transported : target
+*/
+use std::fs::File;
+use ndarray::prelude::*;
+use polars::prelude::*;
+use polars_core::prelude::*;
+use polars_io::prelude::*;
 use plotters::prelude::*;
-use std::collections::HashMap;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Sample data (Replace this with your data)
-    let mut train_df = HashMap::new();
-    train_df.insert("Yes", 30);
-    train_df.insert("No", 70);
+pub fn main()  {
 
-    // Convert HashMap data into a vector of tuples
-    let data: Vec<(&str, i32)> = train_df.into_iter().collect();
+    let mut train_df: DataFrame = CsvReader::from_path("./datasets/spaceship_titanic/train.csv")
+    .unwrap()
+    .finish().unwrap();
 
-    // Create a drawing area that is 800 pixels in width and 600 pixels in height
-    let root = BitMapBackend::new("plot.png", (800, 600)).into_drawing_area();
-    root.fill(&WHITE)?;
-
-    // Create a pie chart
-    let mut  pie = ChartBuilder::on(&root)
-        .caption("Target distribution", ("Arial", 30))
-        .build_ranged(0.0..1.0, 0.0..1.0)?;
-
-    // Draw the pie chart using the provided data
-    // pie.draw_series(
-    //     data.iter()
-    //         .map(|(label, value)| (*label, *value))
-    //         .map(|(label, value)| {
-    //             return (label, value);
-    //         })
-    //         .into_iter()
-    //         .map(|(label, value)| {
-    //             return (      , value, &BLUE);
-    //         }),
-    // )?;
+    println!("{}",train_df);
+    // let root: DrawingArea<BitMapBackend<'_>, plotters::coord::Shift> = BitMapBackend::new("./src/chart/chart01.png", (800, 600)).into_drawing_area();
     
-    // Save the chart to a file named "plot.png"
-    root.present()?;
-
-    Ok(())
 }
