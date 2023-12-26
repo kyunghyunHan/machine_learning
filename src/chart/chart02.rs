@@ -27,6 +27,12 @@ pub fn main()  {
     .finish().unwrap();
 
     println!("{}",train_df);
+
+    let mut test_df: DataFrame = CsvReader::from_path("./datasets/spaceship_titanic/test.csv")
+    .unwrap()
+    .finish().unwrap();
+
+    println!("{}",test_df);
     // let root: DrawingArea<BitMapBackend<'_>, plotters::coord::Shift> = BitMapBackend::new("./src/chart/chart01.png", (800, 600)).into_drawing_area();
     
 }
