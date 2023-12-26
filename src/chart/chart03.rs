@@ -4,8 +4,11 @@ pub fn main(){
     let root_area = BitMapBackend::new(OUT_FILE_NAME, (1024, 768)).into_drawing_area();
     root_area.fill(&WHITE).unwrap();//배경
     //title
-    let root_area = root_area.titled("Image Title", ("sans-serif", 60)).unwrap();;
-    let (upper, lower) = root_area.split_vertically(512);
+    
+    let root_area = root_area.titled("Image Title", ("sans-serif", 60)).unwrap();
+    //수직방향으로 나누기 처음영역이 512
+    let (upper, lower) = root_area.split_vertically(200);
+    //범위설정
     let x_axis = (-3.4f32..3.4).step(0.1);
     let mut cc = ChartBuilder::on(&upper)
     .margin(5)
@@ -20,17 +23,15 @@ pub fn main(){
 //configure_mesh:눈금 및 그리드 설정
 //x_labels:x축에 사용되는 눈금의 개수 설정
 cc.configure_mesh()
-    .x_labels(20)
-    .y_labels(10)
     .disable_mesh()
     .x_label_formatter(&|v| format!("{:.1}", v))
     .y_label_formatter(&|v| format!("{:.1}", v))
     .draw().unwrap();
-
+//Sine
 cc.draw_series(LineSeries::new(x_axis.values().map(|x| (x, x.sin())), &RED)).unwrap()
     .label("Sine")
     .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], RED));
-
+//Cosin
 cc.draw_series(LineSeries::new(
     x_axis.values().map(|x| (x, x.cos())),
     &BLUE,
@@ -51,7 +52,8 @@ cc.draw_series(PointSeries::of_element(
     },
 )).unwrap();
 /*=========================================================== */
-let drawing_areas = lower.split_evenly((1, 2));
+//1행 2열로 나누기
+let drawing_areas = lower.split_evenly((1, 3));
 
 for (drawing_area, idx) in drawing_areas.iter().zip(1..) {
     let mut cc = ChartBuilder::on(drawing_area)
@@ -76,6 +78,6 @@ for (drawing_area, idx) in drawing_areas.iter().zip(1..) {
 }
 
 // To avoid the IO failure being ignored silently, we manually call the present function
-root_area.present().expect("Unable to write result to file, please make sure 'plotters-doc-data' dir exists under current dir");
+root_area.present().unwrap();
 println!("Result has been saved to {}", OUT_FILE_NAME);
 }
