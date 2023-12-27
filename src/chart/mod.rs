@@ -8,4 +8,5 @@ pub mod chart04;
 pub mod linear_function;
 pub mod step_function;
 pub mod sigmoid_function;
+pub mod tanh_function;
 /*===========active_function============ */

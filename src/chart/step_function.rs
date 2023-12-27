@@ -12,7 +12,7 @@ pub fn main() {
     let mut step_function_chart = ChartBuilder::on(&root_area)
         .margin(5)
         .set_all_label_area_size(50)
-        .build_cartesian_2d(-4f32..4f32, -0.2f32..1.2f32) // Adjust Y-axis range for better visualization
+        .build_cartesian_2d(-4f32..4f32, (-0.2f32..1.2f32).step(4.0)) // Adjust Y-axis range for better visualization
         .unwrap();
 
     step_function_chart
