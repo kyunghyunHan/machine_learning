@@ -11,7 +11,8 @@ fn main(){
 // chart::chart03::main();
 // chart::chart04::main();
 // chart::linear_function::main();
-chart::step_function::main();
+// chart::step_function::main();
+chart::sigmoid_function::main();
 /*=========chart======== */
 /*=========fish======== */
 // fish::fish01::main();
