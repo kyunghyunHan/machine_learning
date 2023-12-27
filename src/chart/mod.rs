@@ -6,4 +6,5 @@ pub mod chart04;
 /*===========active_function============ */
 
 pub mod linear_function;
+pub mod step_function;
 /*===========active_function============ */

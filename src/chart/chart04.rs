@@ -17,34 +17,16 @@ pub fn main(){
     .x_label_formatter(&|v| format!("{:.1}", v))
     .y_label_formatter(&|v| format!("{:.1}", v))
     .draw().unwrap();
-// cc.draw_series(PointSeries::of_element(
-//     (-3.0f32..2.1f32).step(1.0).values().map(|x| (x, x)),
-//     5,
-//     ShapeStyle::from(&RED).filled(),
-//     &|coord, size, style| {
-//         EmptyElement::at(coord)
-//             + Circle::new((0, 0), size, style)
-//             + Text::new(format!("{:?}", coord), (0, 15), ("sans-serif", 15))
-//     },
-// )).unwrap();
-cc.draw_series(LineSeries::new(
-    (-10f32..11f32).step(1.0).values().map(|x| (x, x)),
-    &BLUE,
-))
-.unwrap();
-cc
-.draw_series(LineSeries::new(
-    vec![(0.0, -10f32), (0.0, 10.0f32)],
-    &BLACK,
-))
-.unwrap();
+cc.draw_series(PointSeries::of_element(
+    (-3.0f32..2.1f32).step(1.0).values().map(|x| (x, x.signum())),
+    5,
+    ShapeStyle::from(&RED).filled(),
+    &|coord, size, style| {
+        EmptyElement::at(coord)
+            + Circle::new((0, 0), size, style)
+            + Text::new(format!("{:?}", coord), (0, 15), ("sans-serif", 15))
+    },
+)).unwrap();
 
-// Draw horizontal line (X-axis)
-cc
-.draw_series(LineSeries::new(
-    vec![(-10.0, 0.0), (10.0, 0.0)],
-    &BLACK,
-))
-.unwrap();
      
 }

@@ -22,6 +22,7 @@ linear_function.draw_series(LineSeries::new(
     (-8f32..11f32).step(1.0).values().map(|x| (x, x)),
     &BLUE,
 ))
+
 .unwrap();
 linear_function
 .draw_series(LineSeries::new(
