@@ -10,11 +10,41 @@ pub fn main(){
     let mut cc = ChartBuilder::on(&root_area)
     .margin(5)
     .set_all_label_area_size(50)
-    .build_cartesian_2d(-3.4f32..3.4, -1.2f32..1.2f32).unwrap();
+    .build_cartesian_2d(-10.0f32..10.0, -10.0f32..10.0).unwrap();
 
     cc.configure_mesh()
-    .disable_mesh()
+   
     .x_label_formatter(&|v| format!("{:.1}", v))
     .y_label_formatter(&|v| format!("{:.1}", v))
     .draw().unwrap();
+// cc.draw_series(PointSeries::of_element(
+//     (-3.0f32..2.1f32).step(1.0).values().map(|x| (x, x)),
+//     5,
+//     ShapeStyle::from(&RED).filled(),
+//     &|coord, size, style| {
+//         EmptyElement::at(coord)
+//             + Circle::new((0, 0), size, style)
+//             + Text::new(format!("{:?}", coord), (0, 15), ("sans-serif", 15))
+//     },
+// )).unwrap();
+cc.draw_series(LineSeries::new(
+    (-10f32..11f32).step(1.0).values().map(|x| (x, x)),
+    &BLUE,
+))
+.unwrap();
+cc
+.draw_series(LineSeries::new(
+    vec![(0.0, -10f32), (0.0, 10.0f32)],
+    &BLACK,
+))
+.unwrap();
+
+// Draw horizontal line (X-axis)
+cc
+.draw_series(LineSeries::new(
+    vec![(-10.0, 0.0), (10.0, 0.0)],
+    &BLACK,
+))
+.unwrap();
+     
 }
