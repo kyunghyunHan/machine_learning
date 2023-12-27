@@ -1,6 +1,7 @@
 use plotters::prelude::*;
 const OUT_FILE_NAME: &str = "./src/chart/chart03.png";
 pub fn main(){
+    //1024 x 768 pexel setting
     let root_area = BitMapBackend::new(OUT_FILE_NAME, (1024, 768)).into_drawing_area();
     root_area.fill(&WHITE).unwrap();//배경
     //title
@@ -10,6 +11,7 @@ pub fn main(){
     let (upper, lower) = root_area.split_vertically(200);
     //범위설정
     let x_axis = (-3.4f32..3.4).step(0.1);
+    //ChartBuilder를 사용하여 새로운 차트를 생성하는 부분
     let mut cc = ChartBuilder::on(&upper)
     .margin(5)
     .set_all_label_area_size(50)
@@ -22,6 +24,8 @@ pub fn main(){
 
 //configure_mesh:눈금 및 그리드 설정
 //x_labels:x축에 사용되는 눈금의 개수 설정
+//.disable_mesh() // 메시 또는 그리드 라인 비활성화
+
 cc.configure_mesh()
     .disable_mesh()
     .x_label_formatter(&|v| format!("{:.1}", v))
