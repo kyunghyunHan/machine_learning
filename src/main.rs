@@ -15,7 +15,7 @@ chart::step_function::main();
 chart::sigmoid_function::main();
 chart::tanh_function::main();
 chart::relu_function::main();
-chart::sign_function::main()
+chart::sign_function::main();
 /*=========chart======== */
 /*=========fish======== */
 // fish::fish01::main();
@@ -33,6 +33,8 @@ chart::sign_function::main()
 // kaggle::iris_beginner::main();//
 // kaggle::spaceship_beginner::main();
 // kaggle::house_beginner::main();
+
+kaggle::house_price::house_price::main();
 /*=========kaggle======== */
 
 
