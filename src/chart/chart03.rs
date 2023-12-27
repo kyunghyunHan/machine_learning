@@ -6,7 +6,7 @@ pub fn main(){
     root_area.fill(&WHITE).unwrap();//배경
     //title
     
-    let root_area = root_area.titled("Image Title", ("sans-serif", 60)).unwrap();
+    let root_area: DrawingArea<BitMapBackend<'_>, plotters::coord::Shift> = root_area.titled("Image Title", ("sans-serif", 60)).unwrap();
     //수직방향으로 나누기 처음영역이 512
     let (upper, lower) = root_area.split_vertically(200);
     //범위설정

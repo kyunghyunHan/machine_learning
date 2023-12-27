@@ -9,4 +9,6 @@ pub mod linear_function;
 pub mod step_function;
 pub mod sigmoid_function;
 pub mod tanh_function;
+pub mod relu_function;
+pub mod sign_function;
 /*===========active_function============ */

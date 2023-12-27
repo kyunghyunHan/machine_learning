@@ -17,6 +17,7 @@ pub fn main() {
 
     step_function_chart
         .configure_mesh()
+        .disable_mesh()
         .x_label_formatter(&|v| format!("{:.1}", v))
         .y_label_formatter(&|v| format!("{:.1}", v))
         .draw()
@@ -32,6 +33,7 @@ pub fn main() {
         &BLUE,
     ))
     .unwrap();
+
 step_function_chart.draw_series(LineSeries::new(
     (0f32..4.2f32).step(0.2).values().map(|x| (x, 1f32)),
     &BLUE,
