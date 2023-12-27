@@ -20,8 +20,12 @@ pub fn main(){
     let a=  train_df.column("SalePrice").unwrap();
     let y_train: Vec<i64> = a.i64().unwrap().into_no_null_iter().collect();
     let y_train:Vec<f32>= y_train.iter().map(|x|*x as f32).collect();
+    let b: Vec<&Series>= train_df.columns(["YrSold","SalePrice"]).unwrap();
+    println!("{:?}",b);
+    let mut c= train_df.select(["YrSold","SalePrice"]).unwrap();
 
-    println!("{:?}",y_train);
+    let  x_train: ArrayBase<ndarray::OwnedRepr<f64>, Dim<[usize; 2]>> = c.to_ndarray::<Float64Type>(IndexOrder::Fortran).unwrap();
+   
 
     let root_area = BitMapBackend::new(OUT_FILE_NAME, (824, 768)).into_drawing_area();
     root_area.fill(&WHITE).unwrap();//배경
@@ -32,28 +36,8 @@ pub fn main(){
     .build_cartesian_2d(147500f32..208500f32, 147500f32..208500f32).unwrap();
 
 
+   
 
-
-// linear_function
-// .draw_series(LineSeries::new(
-//     vec![(0f32, -8f32), (0f32, 8f32)],
-//     &BLACK,
-// ))
-// .unwrap();
-
-// // Draw horizontal line (X-axis)
-// linear_function
-// .draw_series(LineSeries::new(
-//     vec![(-8f32, 0f32), (8f32, 0f32)],
-//     &BLACK,
-// ))
-// .unwrap();
-// linear_function.draw_series(LineSeries::new(
-//     y_train.into_iter().map(|x|x).step_by(1).map(|x| (x, x)),
-//     &BLUE,
-// ))
-
-// .unwrap();
 linear_function.draw_series(PointSeries::of_element(
     y_train.into_iter().map(|x|x).step_by(1).map(|x| (x, x)),
     2,
