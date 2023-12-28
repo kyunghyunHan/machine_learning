@@ -16,8 +16,10 @@ pub fn main(){
     println!("{}",train_df);
 
 
-    let mut c= train_df.select(["YrSold","SalePrice"]).unwrap();
-    let c= c.sort(&["YrSold"], vec![false, true], true).unwrap();
+    let mut c= train_df.select(["YrSold","SalePrice","MoSold"]).unwrap();
+    let c: DataFrame= c.sort(&["YrSold","MoSold"], vec![false, false], true).unwrap();
+    // let c= c.sort(&["MoSold"], vec![false, true], true).unwrap();
+
     let  x_train: ArrayBase<ndarray::OwnedRepr<f32>, Dim<[usize; 2]>> = c.to_ndarray::<Float32Type>(IndexOrder::Fortran).unwrap();
     
     println!("{:?}",x_train);
@@ -34,11 +36,12 @@ pub fn main(){
     let mut linear_function = ChartBuilder::on(&root_area)
     .margin(5)
     .set_all_label_area_size(10)
-    .build_cartesian_2d((2005f32..2011f32).step(1f32), (140000.0..208500f32).step(1500f32)).unwrap();
+    .build_cartesian_2d((2006f32..2011f32).step(1f32), (10000.0..800000f32).step(1500f32)).unwrap();
 
     linear_function
     .configure_mesh()
-    .disable_mesh()
+    .x_labels(11)
+    .y_labels(31)
     .x_label_formatter(&|v| format!("{:.1}", v))
     .y_label_formatter(&|v| format!("{:.1}", v))
     .draw()
@@ -46,8 +49,8 @@ pub fn main(){
 
    
 
-linear_function.draw_series(PointSeries::of_element(
-    data.into_iter().map(|x|x).step_by(1).map(|x| (x[0], x[1])),
+    linear_function.draw_series(PointSeries::of_element(
+    &mut data.clone().into_iter().map(|x| ((x[0] + x[2] / 10.0), x[1])),
     2,
     ShapeStyle::from(&RED).filled(),
     &|coord, size, style| {
@@ -56,9 +59,10 @@ linear_function.draw_series(PointSeries::of_element(
             // + Text::new(format!("{:?}", coord), (0, 15), ("sans-serif", 15))
     },
 )).unwrap();
-// linear_function.draw_series(LineSeries::new(
-//     data.into_iter().map(|x|x).step_by(1).map(|x| (x[0], x[1])), 
-//     &BLUE,
-// ))
-// .unwrap();
+
+    linear_function.draw_series(LineSeries::new(
+    &mut data.clone().into_iter().map(|x| ((x[0] + x[2] / 10.0), x[1])),
+    &BLUE,
+))
+.unwrap();
 }
