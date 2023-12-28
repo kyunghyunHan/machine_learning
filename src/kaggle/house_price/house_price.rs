@@ -24,9 +24,16 @@ pub fn main(){
     println!("{:?}",b);
     let mut c= train_df.select(["YrSold","SalePrice"]).unwrap();
 
-    let  x_train: ArrayBase<ndarray::OwnedRepr<f64>, Dim<[usize; 2]>> = c.to_ndarray::<Float64Type>(IndexOrder::Fortran).unwrap();
-   
+    let  x_train: ArrayBase<ndarray::OwnedRepr<f32>, Dim<[usize; 2]>> = c.to_ndarray::<Float32Type>(IndexOrder::Fortran).unwrap();
 
+    println!("{:?}",x_train);
+    let mut data: Vec<Vec<_>> = Vec::new();
+    for row in x_train.outer_iter() {
+        let row_vec: Vec<_> = row.iter().cloned().collect();
+        data.push(row_vec);
+    }
+    println!("{:?}",data);
+    
     let root_area = BitMapBackend::new(OUT_FILE_NAME, (824, 768)).into_drawing_area();
     root_area.fill(&WHITE).unwrap();//배경
     let root_area: DrawingArea<BitMapBackend<'_>, plotters::coord::Shift> = root_area.titled("House Price", ("sans-serif", 60)).unwrap();
@@ -39,7 +46,7 @@ pub fn main(){
    
 
 linear_function.draw_series(PointSeries::of_element(
-    y_train.into_iter().map(|x|x).step_by(1).map(|x| (x, x)),
+    data.into_iter().map(|x|x).step_by(1).map(|x| (x[0], x[1])),
     2,
     ShapeStyle::from(&RED).filled(),
     &|coord, size, style| {
