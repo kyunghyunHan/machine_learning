@@ -1,8 +1,7 @@
 mod polars_ch;
 mod chart;
 mod fish;
-mod kaggle;
-
+mod ml;
 fn main(){
 
 /*=========chart======== */
@@ -28,14 +27,7 @@ chart::sign_function::main();
 /*=========polars======== */
 // polars_ch::polars_ch01::main();
 /*=========polars======== */
-/*=========kaggle======== */
-// kaggle::titanic_beginner::main();
-// kaggle::iris_beginner::main();//
-// kaggle::spaceship_beginner::main();
-// kaggle::house_beginner::main();
 
-kaggle::house_price::house_price::main();
-/*=========kaggle======== */
 
 
 }
