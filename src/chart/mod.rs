@@ -12,3 +12,5 @@ pub mod tanh_function;
 pub mod relu_function;
 pub mod sign_function;
 /*===========active_function============ */
+
+pub mod time_series;
