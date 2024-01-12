@@ -2,6 +2,7 @@ mod polars_ch;
 mod chart;
 mod fish;
 mod ml;
+mod sql;
 fn main(){
 
 /*=========chart======== */
@@ -15,7 +16,7 @@ fn main(){
 // chart::tanh_function::main();
 // chart::relu_function::main();
 // chart::sign_function::main();
-chart::time_series::main();
+// chart::time_series::main();
 /*=========chart======== */
 /*=========fish======== */
 // fish::fish01::main();
@@ -28,7 +29,8 @@ chart::time_series::main();
 /*=========polars======== */
 // polars_ch::polars_ch01::main();
 /*=========polars======== */
+/*=========DB======== */
 
-
+sql::sql_connect::main();
 
 }
