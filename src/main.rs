@@ -3,6 +3,7 @@ mod chart;
 mod fish;
 mod ml;
 mod sql;
+mod ds_note;
 fn main(){
 
 /*=========chart======== */
