@@ -1,30 +1,49 @@
 use polars::prelude::*;
 use reqwest;
-use reqwest::Client;
+use smartcore::model_selection::train_test_split;
+use smartcore::linalg::basic::matrix::DenseMatrix;
+use smartcore::linear::linear_regression::{LinearRegression, LinearRegressionParameters};
+use smartcore::metrics::*;/*
+
+
+
+*/
 #[tokio::main]
 
 pub async fn main()-> Result<(), reqwest::Error> {
-    let url = "htts://media.githubusercontent.com/media/must-ML10/data_source/main/insurance.csv";
-    let client = Client::new();
-//   let tf= CsvReader::from_path(path)
-    // Make a GET request to the specified URL
-    let resp = client.get(url).send().await?;
-     
-    // Check if the request was successful (status code 2xx)
-    if resp.status().is_success() {
-        // Read the response body
-        let body = resp.text().await?;
-        let reader = CsvReader::new(std::io::Cursor::new(body)).has_header(true);
+    let url = "https://media.githubusercontent.com/media/musthave-ML10/data_source/main/insurance.csv";
+    let client = reqwest::Client::new();
 
-        // Read the CSV data into a DataFrame
-        let df: DataFrame = reader.finish().unwrap();
+    let resp: reqwest::Response = client.get(url).send().await?;
 
-        println!("Response body: {}", df);
-        
-    } else {
-        // Print an error message if the request was not successful
-        eprintln!("Request failed with status code: {}", resp.status());
+  
+    let body = resp.bytes().await?;
+
+    let reader = CsvReader::new(std::io::Cursor::new(body)).has_header(true);
+    /*데이터 불러오기 */
+    let df = reader.finish().unwrap();
+
+    println!("{:?}", df);
+    println!("{:?}", df.head(None));
+    println!("{:?}", df.schema());
+    println!("{:?}", df.null_count());
+
+    let y= df.column("charges").unwrap().f64().unwrap().into_no_null_iter().map(|x|x as i32).collect::<Vec<i32>>();
+    let x= df.drop("charges").unwrap().to_ndarray::<Float64Type>(IndexOrder::Fortran).unwrap();
+    let mut x_vec: Vec<Vec<_>> = Vec::new();
+    for row in x.outer_iter(){
+        let row_vec:Vec<_>=row.iter().cloned().collect();
+        x_vec.push(row_vec);
     }
+    let x: DenseMatrix<f64> = DenseMatrix::from_2d_vec(&x_vec);
+
+    let (x_train, x_test, y_train, y_test) = train_test_split(&x, &y, 0.2, true, None);
+
+
+    let model= LinearRegression::fit(&x_train, &y_train, LinearRegressionParameters::default()).unwrap();
+    let y_pred: Vec<i32> = model.predict(&x_test).unwrap();
+    let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&y_test, &y_pred);
+    println!("{}",acc);
 
     Ok(())
 
