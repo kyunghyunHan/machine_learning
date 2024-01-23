@@ -28,7 +28,7 @@ pub async fn main()-> Result<(), reqwest::Error> {
     println!("{:?}", df.schema());
     println!("{:?}", df.null_count());
 
-    let y= df.column("charges").unwrap().f64().unwrap().into_no_null_iter().map(|x|x as i32).collect::<Vec<i32>>();
+    let y= df.column("charges").unwrap().f64().unwrap().into_no_null_iter().map(|x|x as f64).collect::<Vec<f64>>();
     let x= df.drop("charges").unwrap().to_ndarray::<Float64Type>(IndexOrder::Fortran).unwrap();
     let mut x_vec: Vec<Vec<_>> = Vec::new();
     for row in x.outer_iter(){
@@ -41,9 +41,13 @@ pub async fn main()-> Result<(), reqwest::Error> {
 
 
     let model= LinearRegression::fit(&x_train, &y_train, LinearRegressionParameters::default()).unwrap();
-    let y_pred: Vec<i32> = model.predict(&x_test).unwrap();
-    let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&y_test, &y_pred);
-    println!("{}",acc);
+    let y_pred: Vec<f64> = model.predict(&x_test).unwrap();
+    // let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&y_test, &y_pred);
+    
+    // println!("{}",acc);
+
+    let mean_squared_error= mean_squared_error(&y_test, &y_pred);
+    println!("{}",f64::powf(mean_squared_error, 0.5) );
 
     Ok(())
 
