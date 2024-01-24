@@ -45,7 +45,7 @@ pub async fn main()-> Result<(), reqwest::Error> {
     // let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&y_test, &y_pred);
     
     // println!("{}",acc);
-
+    /*mean_squared_error */
     let mean_squared_error= mean_squared_error(&y_test, &y_pred);
     println!("{}",f64::powf(mean_squared_error, 0.5) );
 
