@@ -1,3 +1,6 @@
+
+use polars::lazy::dsl::cov;
+use polars::prelude::cov::pearson_corr;
 use polars::prelude::*;
 use linfa::prelude::*;
 use ndarray::prelude::*;
@@ -52,7 +55,18 @@ let  mut fish_data = stack![Axis(1), length, weight];
 
 let arr: ArrayBase<ndarray::OwnedRepr<i32>, Dim<[usize; 1]>>= arr1(&[1,1,1,1,1]);
 let dataset= Dataset::new(fish_data,arr);
+let mut s0 = Series::new("col1", [1,2,3,4,5,6].as_ref());
+let s1 = Series::new("col2", [1,4,2,8,16,32].as_ref());
+let s2 = Series::new("col3", [6,5,4,3,2,1].as_ref());
+let df= DataFrame::new(vec![s0.clone(), s1.clone(),s2]).unwrap();
+let a: f64= pearson_corr(s0.clone().u16().unwrap(), s1.clone().u16().unwrap(), 1).unwrap();
+let df: DataFrame= df.clone().lazy().with_columns([cov(col("1"), col("2"), 1).alias("col4")]).collect().unwrap();
+let data = vec![
+    vec![1.0, 2.0, 3.0],
+    vec![4.0, 5.0, 6.0],
+    vec![7.0, 8.0, 9.0],
+];
 
-
+let a: f64= pearson_corr(s0.clone().u16().unwrap(), s1.clone().u16().unwrap(), 1).unwrap();
 
 }

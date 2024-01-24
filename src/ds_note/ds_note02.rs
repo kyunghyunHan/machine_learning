@@ -34,8 +34,6 @@ pub async fn main()-> Result<(), reqwest::Error> {
     let x: DenseMatrix<f64> = DenseMatrix::from_2d_vec(&x_vec);
 
     let (x_train, x_test, y_train, y_test) = train_test_split(&x, &y, 0.2, true, None);
-
-
     let model= LinearRegression::fit(&x_train, &y_train, LinearRegressionParameters::default()).unwrap();
     let y_pred: Vec<f64> = model.predict(&x_test).unwrap();
 
