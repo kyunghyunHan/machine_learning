@@ -3,11 +3,7 @@ use reqwest;
 use smartcore::model_selection::train_test_split;
 use smartcore::linalg::basic::matrix::DenseMatrix;
 use smartcore::linear::linear_regression::{LinearRegression, LinearRegressionParameters};
-use smartcore::metrics::*;/*
-
-
-
-*/
+use smartcore::metrics::*;
 #[tokio::main]
 
 pub async fn main()-> Result<(), reqwest::Error> {
@@ -42,14 +38,18 @@ pub async fn main()-> Result<(), reqwest::Error> {
 
     let model= LinearRegression::fit(&x_train, &y_train, LinearRegressionParameters::default()).unwrap();
     let y_pred: Vec<f64> = model.predict(&x_test).unwrap();
-    // let acc: f64 = ClassificationMetricsOrd::accuracy().get_score(&y_test, &y_pred);
-    
-    // println!("{}",acc);
-    /*mean_squared_error */
-    let mean_squared_error= mean_squared_error(&y_test, &y_pred);
-    println!("{}",f64::powf(mean_squared_error, 0.5) );
 
+    //이진분류에서만 사용가능
+    let r2: f64 =r2(&y_test, &y_pred);
+
+    println!("{}",r2);
+
+
+    let mean_squared_error= mean_squared_error(&y_test, &y_pred);
+    println!("{}",mean_squared_error );
+    
     Ok(())
 
 
 }
+
