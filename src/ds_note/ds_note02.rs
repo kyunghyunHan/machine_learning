@@ -41,7 +41,7 @@ pub async fn main()-> Result<(), reqwest::Error> {
 
     //이진분류에서만 사용가능
     let r2: f64 =r2(&y_test, &y_pred);
-
+   
     println!("{}",r2);
 
 
@@ -49,6 +49,8 @@ pub async fn main()-> Result<(), reqwest::Error> {
     println!("{}",f64::powf(mean_squared_error, 0.5) );
     
     Ok(())
+
+    
 
 
 }
